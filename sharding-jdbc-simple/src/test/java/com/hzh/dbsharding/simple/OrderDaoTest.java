@@ -26,14 +26,14 @@ public class OrderDaoTest {
     @Test
     public void testInsertOrder(){
         for(int i=1;i<20;i++){
-            orderDao.insertOrder(new BigDecimal(i),1L,"SUCCESS");
+            orderDao.insertOrder(new BigDecimal(i),Long.valueOf(i),"SUCCESS");
         }
     }
 
     @Test
     public void testSelectOrderbyIds(){
         List<Long> ids = new ArrayList<>();
-        ids.add(799685717457371136L);
+//        ids.add(799685717457371136L);
         ids.add(799685717524480001L);
 
         List<Map> maps = orderDao.selectOrderbyIds(ids);

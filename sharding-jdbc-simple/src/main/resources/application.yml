@@ -14,24 +14,54 @@ spring:
     allow-bean-definition-overriding: true
   shardingsphere:
     datasource:
-      names: m1
+      names: m0,m1,m2
+      m0:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/user_db?useUnicode=true&useSSL=false
+        username: root
+        password: a1160124552
       m1:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: com.mysql.jdbc.Driver
-        url: jdbc:mysql://localhost:3306/order_db?useUnicode=true&useSSL=false
+        url: jdbc:mysql://localhost:3306/order_db_1?useUnicode=true&useSSL=false
+        username: root
+        password: a1160124552
+      m2:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/order_db_2?useUnicode=true&useSSL=false
         username: root
         password: a1160124552
     sharding:
       tables:
+        t_user:
+          #配置节点
+          actualDataNodes: m$->{0}.t_user
+          #配置分表
+          tableStrategy:
+            inline:
+              shardingColumn: user_id
+              algorithm‐expression: t_user
         t_order:
-          actualDataNodes: m1.t_order_$->{1..2}
+          #配置节点
+          actualDataNodes: m$->{1..2}.t_order_$->{1..2}
+          #配置分库
+          database‐strategy:
+            inline:
+              sharding‐column: user_id
+              algorithm‐expression: m\$‐>{user_id%2 +1}
+          #配置分表
           tableStrategy:
             inline:
               shardingColumn: order_id
-              algorithmExpression: t_order_$->{order_id % 2 + 1}
+              algorithm‐expression: t_order_$->{order_id % 2 + 1}
+          #配置柱间生成策略
           keyGenerator:
             type: SNOWFLAKE
             column: order_id
+      #配置t_dict为公共表
+      broadcast-tables: t_dict
     props:
       sql:
         show: true
